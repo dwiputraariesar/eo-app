@@ -24,6 +24,8 @@ class Payment extends Model
         'payment_method',
         'status',
         'transaction_id',
+        'payment_url',
+        'va_number',
     ];
 
     /**

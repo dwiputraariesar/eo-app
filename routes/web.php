@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/event/{id}', [EventController::class, 'show'])->name('events.show');
@@ -36,10 +38,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     // --- 3. AREA KHUSUS ATTENDEE (PEMBELI) ---
-    // User biasa tidak butuh dashboard khusus karena mereka pakai default,
-    // tapi nanti kita butuh route untuk tiket saya, history, dll.
     Route::middleware('role:attendee')->group(function () {
-        // Contoh: Route::get('/my-tickets', ...);
+        
+        // 1. Proses Beli Tiket (POST)
+        Route::post('/event/{id}/book', [BookingController::class, 'store'])->name('bookings.store');
+
+        // 2. Halaman Tiket Saya (GET)
+        Route::get('/my-tickets', [BookingController::class, 'index'])->name('bookings.index');
+
+        // 3. Halaman Checkout (Pending)
+        Route::get('/payment/{id}/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
+
+        // 4. Halaman Sukses (Trigger pembayaran berhasil)
+        Route::get('/payment/{id}/success', [PaymentController::class, 'processSuccess'])->name('payment.success');
+
+        // 5. Halaman Gagal (Trigger pembayaran gagal)
+        Route::get('/payment/{id}/failed', [PaymentController::class, 'processFailed'])->name('payment.failed');
     });
 
 
@@ -60,7 +74,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // 5. Proses Hapus (Pakai DELETE)
         Route::delete('/mitra/events/{id}', [EventController::class, 'destroy'])->name('mitra.events.destroy');
     });
-        
         // Nanti tambahkan route 'create-event', 'manage-event' di sini
     });
 

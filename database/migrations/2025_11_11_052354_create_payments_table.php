@@ -16,9 +16,10 @@ return new class extends Migration
 
         // Foreign Key
         $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
-
+        $table->string('payment_url')->nullable();
+        $table->string('va_number')->nullable();
         $table->decimal('amount', 10, 2);
-        $table->enum('payment_method', ['credit_card', 'paypal']); // Tambahkan metode lain jika perlu
+        $table->enum('payment_method', ['credit_card', 'paypal'])->nullable; // Tambahkan metode lain jika perlu
         $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
         $table->string('transaction_id')->unique(); // 'UK' (Unique)
 
