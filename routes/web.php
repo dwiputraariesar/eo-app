@@ -2,10 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\HomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/event/{id}', [EventController::class, 'show'])->name('events.show');
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // --- 1. DASHBOARD UTAMA (REDIRECTOR) ---
@@ -46,9 +47,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:organizer')->group(function () {
         
         // Dashboard khusus Mitra
-        Route::get('/mitra/dashboard', function () {
-            return view('mitra.dashboard'); 
-        })->name('mitra.dashboard');
+        // Panggil fungsi index di EventController
+        Route::get('/mitra/dashboard', [EventController::class, 'index'])->name('mitra.dashboard');
+        // 1. Route untuk menampilkan formulir
+        Route::get('/mitra/events/create', [EventController::class, 'create'])->name('mitra.events.create');
+        // 2. Route untuk memproses data form (simpan ke db)
+        Route::post('/mitra/events', [EventController::class, 'store'])->name('mitra.events.store');
+        // 3. Form Edit
+        Route::get('/mitra/events/{id}/edit', [EventController::class, 'edit'])->name('mitra.events.edit');
+        // 4. Proses Update (Pakai PUT)
+        Route::put('/mitra/events/{id}', [EventController::class, 'update'])->name('mitra.events.update');
+        // 5. Proses Hapus (Pakai DELETE)
+        Route::delete('/mitra/events/{id}', [EventController::class, 'destroy'])->name('mitra.events.destroy');
+    });
         
         // Nanti tambahkan route 'create-event', 'manage-event' di sini
     });
@@ -64,7 +75,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Nanti tambahkan route 'manage-users', 'approve-event' di sini
     });
-
-});
 
 require __DIR__.'/auth.php';
