@@ -148,4 +148,25 @@ class EventController extends Controller
 
         return redirect()->route('mitra.dashboard')->with('success', 'Event berhasil dihapus.');
     }
+    /**
+     * Menampilkan daftar peserta/pembeli tiket untuk event tertentu.
+     */
+    public function participants($id)
+    {
+        $event = Event::findOrFail($id);
+
+        // 1. KEAMANAN: Pastikan hanya pemilik event yang boleh lihat
+        if ($event->organizer_id !== Auth::id()) {
+            abort(403, 'Anda tidak berhak melihat data ini.');
+        }
+
+        // 2. Ambil data booking yang terkait dengan event ini
+        // Kita gunakan 'with' untuk mengambil data user dan payment sekaligus (Eager Loading)
+        $bookings = $event->bookings()
+                          ->with(['user', 'payment'])
+                          ->orderBy('created_at', 'desc')
+                          ->get();
+
+        return view('mitra.events.participants', compact('event', 'bookings'));
+    }
 }
