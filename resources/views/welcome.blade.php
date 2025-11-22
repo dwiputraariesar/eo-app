@@ -34,94 +34,97 @@
         </div>
     </nav>
 
-    {{-- Hero Section dengan Background dan Logo --}}
-    {{-- PENTING: Jangan lupa ganti url gambar background nanti saat Anda sudah punya gambarnya --}}
-    <div class="relative bg-blue-600 py-28 text-center text-white bg-cover bg-center" style="background-image: url('path/to/your/background-image.jpg');">
+    {{-- Hero Section Compact --}}
+    <div class="relative bg-blue-600 py-10 text-center text-white bg-cover bg-center" style="background-image: url('{{ asset('images/header-bg.jpg') }}');">
         <div class="absolute inset-0 bg-black opacity-50"></div>
         
         <div class="relative z-10 flex flex-col items-center justify-center h-full px-4">
-            {{-- Logo VENTO (Pastikan file ada di public/images/vento-logo-white.png) --}}
-            <img src="{{ asset('images/vento-logo-white.png') }}" alt="VENTO Logo" class="w-48 md:w-64 mb-8 mx-auto drop-shadow-lg">
+            {{-- 
+                LOGO (vento-logo-white.png)
+                w-60 md:w-[350px] -> Ukuran pas agar tidak perlu scroll
+                mb-0              -> Jarak ke teks dibuat 0 (rapat)
+            --}}
+            <img src="{{ asset('images/vento-logo-white.png') }}" alt="VENTO Logo" class="w-60 md:w-[350px] mb-0 mx-auto drop-shadow-lg">
             
-            {{-- Head Baru dengan Font Montserrat --}}
-            {{-- Perhatikan penambahan class: font-['Montserrat'] dan font-black --}}
-            <h1 class="text-5xl md:text-7xl font-['Montserrat'] font-black mb-4 drop-shadow-2xl tracking-wider leading-tight uppercase">
+            {{-- 
+                TEKS TAGLINE
+                mt-2 -> Memberi sedikit jarak dari logo (opsional, bisa dihapus jika ingin lebih rapat)
+            --}}
+            <h1 class="text-lg md:text-2xl font-['Montserrat'] font-medium drop-shadow-md tracking-[0.3em] leading-tight uppercase mt-2">
                 Catch the Vibe
             </h1>
         </div>
     </div>
 
     {{-- Daftar Event --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">Event Terbaru</h2>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Event Terbaru</h2>
         </div>
 
         @if($events->isEmpty())
-            <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <p class="text-gray-500 text-lg font-medium">Belum ada event yang tersedia saat ini.</p>
-                <p class="text-gray-400 mt-2">Cek kembali nanti untuk update terbaru.</p>
+            <div class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+                <p class="text-gray-500 text-base">Belum ada event yang tersedia saat ini.</p>
             </div>
         @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {{-- Grid diubah: sm:2 kolom, lg:3 kolom, xl:4 kolom (Biar kartu lebih kecil) --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($events as $event)
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 flex flex-col h-full">
+                <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 flex flex-col h-full">
                     
                     {{-- Gambar Event --}}
-                    <div class="h-56 bg-gray-200 relative overflow-hidden group">
+                    <div class="h-40 bg-gray-100 relative overflow-hidden group rounded-t-lg">
                         @if($event->banner_image_url)
                             <img src="{{ Storage::url($event->banner_image_url) }}" alt="{{ $event->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-gray-100">
-                                <span class="text-gray-300 text-5xl">🖼️</span>
+                                <span class="text-gray-300 text-3xl">🖼️</span>
                             </div>
                         @endif
                         
-                        {{-- Badge Kategori & Status --}}
-                        <div class="absolute top-4 left-4 flex gap-2">
-                            <span class="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 rounded-full shadow-sm backdrop-blur-md bg-opacity-80">
+                        {{-- Badge Kategori --}}
+                        <div class="absolute top-2 left-2 flex gap-1">
+                            <span class="px-2 py-0.5 text-[10px] font-bold text-blue-700 bg-blue-100 rounded shadow-sm bg-opacity-90">
                                 {{ $event->category->name ?? 'Umum' }}
                             </span>
-                            @if($event->status == 'draft')
-                                <span class="px-3 py-1 text-xs font-bold text-gray-600 bg-gray-200 rounded-full shadow-sm backdrop-blur-md bg-opacity-80">DRAFT</span>
-                            @endif
                         </div>
                     </div>
 
-                    <div class="p-6 flex-grow flex flex-col justify-between">
+                    {{-- Konten --}}
+                    <div class="p-4 flex-grow flex flex-col justify-between">
                         <div>
                             {{-- Judul --}}
-                            <h3 class="text-2xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 hover:text-blue-600 transition">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-3 leading-snug line-clamp-2 hover:text-blue-600 transition">
                                 <a href="{{ route('events.show', $event->id) }}">
                                     {{ $event->title }}
                                 </a>
                             </h3>
                             
-                            {{-- Info Tanggal & Lokasi --}}
-                            <div class="text-sm text-gray-600 space-y-2 mb-6">
+                            {{-- Info Tanggal & Lokasi (UKURAN DIPERBESAR) --}}
+                            <div class="text-sm text-gray-600 space-y-2 mb-4">
                                 <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    {{-- Ikon Tanggal --}}
+                                    <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     <span class="font-medium">{{ \Carbon\Carbon::parse($event->start_datetime)->format('d M Y, H:i') }}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                    <span class="truncate font-medium">{{ $event->location }}</span>
+                                    {{-- Ikon Lokasi --}}
+                                    <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    <span class="truncate">{{ $event->location }}</span>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Harga & Tombol --}}
-                        <div class="flex items-end justify-between mt-auto pt-4 border-t border-gray-100">
+                        <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
                             <div>
-                                <p class="text-xs text-gray-500 mb-1 font-medium">Mulai dari</p>
-                                <p class="text-xl font-extrabold text-blue-600">
+                                <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Mulai dari</p>
+                                <p class="text-lg font-bold text-blue-600 leading-none">
                                     Rp {{ number_format($event->ticket_price, 0, ',', '.') }}
                                 </p>
                             </div>
-                            <a href="{{ route('events.show', $event->id) }}" class="inline-flex items-center justify-center bg-gray-900 hover:bg-blue-600 text-white text-sm font-bold py-2.5 px-5 rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg">
-                                Lihat Detail
-                                <svg class="w-4 h-4 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            <a href="{{ route('events.show', $event->id) }}" class="inline-flex items-center justify-center bg-gray-900 hover:bg-blue-600 text-white text-base font-bold py-2 px-4 rounded transition-colors duration-300 shadow-sm">
+                                Beli Tiket
                             </a>
                         </div>
                     </div>
