@@ -32,13 +32,25 @@
                                     
                                     {{-- Info Event --}}
                                     <div class="flex-1">
-                                        <div class="text-xs text-gray-500 mb-1">Kode Booking: <span class="font-mono font-bold text-gray-700">{{ $booking->confirmation_code }}</span></div>
-                                        <h3 class="text-lg font-bold text-blue-600">
-                                            {{ $booking->event->title ?? 'Event Tidak Ditemukan' }}
-                                        </h3>
+                                        <div class="text-xs text-gray-500 mb-1">
+                                            Kode Booking: <span class="font-mono font-bold text-gray-700">{{ $booking->confirmation_code }}</span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <h3 class="text-lg font-bold text-blue-600">
+                                                {{ $booking->event->title ?? 'Event Tidak Ditemukan' }}
+                                            </h3>
+                                            
+                                            {{-- TAMPILKAN JENIS TIKET (BARU) --}}
+                                            @if($booking->ticketCategory)
+                                                <span class="px-2 py-0.5 rounded text-xs font-bold bg-purple-100 text-purple-700 border border-purple-200">
+                                                    {{ $booking->ticketCategory->name }}
+                                                </span>
+                                            @endif
+                                        </div>
                                         
                                         @if($booking->event)
-                                            <p class="text-sm text-gray-600 mt-1">
+                                            <p class="text-sm text-gray-600">
                                                 📅 {{ \Carbon\Carbon::parse($booking->event->start_datetime)->format('d M Y, H:i') }} <br>
                                                 📍 {{ $booking->event->location }}
                                             </p>

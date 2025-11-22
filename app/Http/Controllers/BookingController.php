@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use App\Models\Payment;
+use App\Models\TicketCategory;
 
 class BookingController extends Controller
 {
@@ -18,20 +19,30 @@ class BookingController extends Controller
     {
         // 1. Validasi Input
         $request->validate([
+            'ticket_category_id' => 'required|exists:ticket_categories,id', // Validasi Kategori
             'quantity' => 'required|integer|min:1|max:10',
         ]);
         $expiredHours = (int) config('services.payment.expired_hours', 24);
-        // 2. Ambil Data Event
+
+        /// 2. Ambil Data Event & Kategori
         $event = Event::findOrFail($eventId);
+        $category = TicketCategory::findOrFail($request->ticket_category_id);
+        // (Opsional) Cek apakah kategori ini milik event yang benar?
+        if($category->event_id != $event->id) {
+            return back()->withErrors(['ticket_category_id' => 'Kategori tiket tidak valid.']);
+        }
+        // (Opsional) Cek Kuota Kategori
+        // if($category->quota < $request->quantity) { ... }
 
-        // 3. Hitung Total Harga
+        // 3. Hitung Total Harga (Berdasarkan Kategori)
         $quantity = $request->quantity;
-        $totalPrice = $event->ticket_price * $quantity;
+        $totalPrice = (int) ($category->price * $quantity);
 
-        // 4. Simpan ke Database
+        // 4. Simpan ke Database Booking
         $booking = Booking::create([
             'user_id' => Auth::id(),
             'event_id' => $event->id,
+            'ticket_category_id' => $category->id, // Simpan ID kategori
             'quantity' => $quantity,
             'total_amount' => $totalPrice,
             'status' => 'pending',

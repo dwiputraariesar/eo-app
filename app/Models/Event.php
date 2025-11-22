@@ -72,4 +72,11 @@ class Event extends Model
     {
         return $this->hasMany(Review::class);
     }
+    /**
+     * Relasi: Satu Event memiliki banyak Kategori Tiket.
+     */
+    public function ticketCategories()
+    {
+        return $this->hasMany(TicketCategory::class);
+    }
 }

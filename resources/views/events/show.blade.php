@@ -73,40 +73,39 @@
                 </div>
             </div>
 
-            {{-- Kolom Kanan: Info Tiket & Booking --}}
+            {{-- Kolom Kanan: Pilihan Tiket --}}
             <div class="md:col-span-1">
                 <div class="bg-white p-6 rounded-lg shadow-lg sticky top-24 border-t-4 border-blue-600">
-                    <h3 class="text-lg font-bold mb-2 text-gray-800">Informasi Tiket</h3>
-                    
-                    <div class="mb-6">
-                        <p class="text-sm text-gray-500">Harga per tiket</p>
-                        <p class="text-3xl font-bold text-blue-600">
-                            Rp {{ number_format($event->ticket_price, 0, ',', '.') }}
-                        </p>
-                    </div>
-
-                    <div class="mb-6 space-y-2 text-sm text-gray-600">
-                        <div class="flex justify-between">
-                            <span>Kapasitas:</span>
-                            <span class="font-semibold">{{ $event->max_capacity }} Orang</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Status:</span>
-                            @if($event->status == 'published')
-                                <span class="text-green-600 font-bold">Buka</span>
-                            @else
-                                <span class="text-gray-500 font-bold">{{ ucfirst($event->status) }}</span>
-                            @endif
-                        </div>
-                    </div>
+                    <h3 class="text-lg font-bold mb-4 text-gray-800">Pilih Tiket</h3>
 
                     @auth
                         @if(auth()->user()->user_type == 'attendee')
-                            {{-- Form Booking --}}
+                            
                             <form action="{{ route('bookings.store', $event->id) }}" method="POST">
                                 @csrf
+                                
+                                {{-- Loop Kategori Tiket --}}
+                                <div class="space-y-3 mb-6">
+                                    @foreach($event->ticketCategories as $category)
+                                        <label class="relative block cursor-pointer">
+                                            <input type="radio" name="ticket_category_id" value="{{ $category->id }}" class="peer sr-only" required>
+                                            
+                                            <div class="p-4 rounded-lg border-2 border-gray-200 hover:border-blue-300 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <span class="font-bold text-gray-800">{{ $category->name }}</span>
+                                                    <span class="text-blue-600 font-bold">Rp {{ number_format($category->price, 0, ',', '.') }}</span>
+                                                </div>
+                                                <div class="text-xs text-gray-500">
+                                                    Sisa Kuota: {{ $category->quota }}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+
+                                {{-- Jumlah Tiket --}}
                                 <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Tiket</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
                                     <select name="quantity" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                         <option value="1">1 Tiket</option>
                                         <option value="2">2 Tiket</option>
@@ -115,10 +114,12 @@
                                         <option value="5">5 Tiket</option>
                                     </select>
                                 </div>
+
                                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-md transform hover:-translate-y-1">
                                     Beli Tiket Sekarang
                                 </button>
                             </form>
+
                         @elseif(auth()->user()->user_type == 'organizer')
                              <div class="bg-blue-50 text-blue-800 p-3 rounded text-sm text-center">
                                 Ini adalah event Anda (Mode Mitra).
@@ -129,11 +130,21 @@
                             </div>
                         @endif
                     @else
-                        <a href="{{ route('login') }}" class="block w-full bg-gray-800 hover:bg-gray-900 text-white text-center font-bold py-3 px-4 rounded-lg transition">
+                        <div class="space-y-3">
+                            @foreach($event->ticketCategories as $category)
+                                <div class="p-3 rounded-lg border border-gray-200 bg-gray-50 opacity-75">
+                                    <div class="flex justify-between font-medium">
+                                        <span>{{ $category->name }}</span>
+                                        <span>Rp {{ number_format($category->price, 0, ',', '.') }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <a href="{{ route('login') }}" class="block w-full bg-gray-800 hover:bg-gray-900 text-white text-center font-bold py-3 px-4 rounded-lg transition mt-4">
                             Login untuk Membeli
                         </a>
                     @endauth
-
+                    
                 </div>
             </div>
         </div>

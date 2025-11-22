@@ -23,6 +23,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'event_id',
+        'ticket_category_id',
         'quantity',
         'total_amount',
         'status',
@@ -56,5 +57,12 @@ class Booking extends Model
     {
         // 'booking_id' adalah foreign key di tabel 'payments'
         return $this->hasOne(Payment::class);
+    }
+    /**
+     * Relasi: Booking memiliki satu Kategori Tiket.
+     */
+    public function ticketCategory()
+    {
+        return $this->belongsTo(TicketCategory::class);
     }
 }

@@ -31,38 +31,61 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input
-        $validated = $request->validate([
+        // 1. Validasi
+        $request->validate([
             'title' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'description' => 'required|string',
             'location' => 'required|string',
             'start_datetime' => 'required|date',
             'end_datetime' => 'required|date|after:start_datetime',
-            'ticket_price' => 'required|numeric|min:0',
-            'max_capacity' => 'required|integer|min:1',
-            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'banner_image' => 'nullable|image|max:2048',
+            
+            // Validasi Array Tiket
+            'tickets' => 'required|array|min:1',
+            'tickets.*.name' => 'required|string',
+            'tickets.*.price' => 'required|numeric|min:0',
+            'tickets.*.quota' => 'required|integer|min:1',
         ]);
 
-        // 2. Tambahkan data otomatis (ID Organizer & Status)
-        $validated['organizer_id'] = Auth::id(); 
-        $validated['status'] = 'draft'; 
-
-        // === BARU: PROSES UPLOAD GAMBAR ===
+        // 2. Upload Gambar
+        $bannerPath = null;
         if ($request->hasFile('banner_image')) {
-            // Simpan file ke folder 'storage/app/public/posters'
-            // Fungsi store() mengembalikan path (alamat) file tersebut
-            $path = $request->file('banner_image')->store('posters', 'public');
-            
-            // Simpan path tersebut ke kolom 'banner_image_url' di database
-            $validated['banner_image_url'] = $path;
+            $bannerPath = $request->file('banner_image')->store('posters', 'public');
         }
 
-        // 3. Simpan ke Database
-        Event::create($validated);
+        // 3. Simpan Event (Induk)
+        // Trik: Kita isi ticket_price & max_capacity di tabel events dengan 
+        // harga terendah & total kapasitas dari inputan, agar halaman depan tidak error.
+        $minPrice = min(array_column($request->tickets, 'price'));
+        $totalQuota = array_sum(array_column($request->tickets, 'quota'));
 
-        // 4. Redirect ke dashboard mitra dengan pesan sukses
-        return redirect()->route('mitra.dashboard')->with('success', 'Event berhasil dibuat!');
+        $event = Event::create([
+            'title' => $request->title,
+            'category_id' => $request->category_id,
+            'description' => $request->description,
+            'location' => $request->location,
+            'start_datetime' => $request->start_datetime,
+            'end_datetime' => $request->end_datetime,
+            'banner_image_url' => $bannerPath,
+            'organizer_id' => Auth::id(),
+            'status' => 'draft',
+            
+            // Data pelengkap untuk backward compatibility
+            'ticket_price' => $minPrice, 
+            'max_capacity' => $totalQuota, 
+        ]);
+
+        // 4. Simpan Kategori Tiket (Anak)
+        foreach ($request->tickets as $ticketData) {
+            $event->ticketCategories()->create([
+                'name' => $ticketData['name'],
+                'price' => $ticketData['price'],
+                'quota' => $ticketData['quota'],
+            ]);
+        }
+
+        return redirect()->route('mitra.dashboard')->with('success', 'Event berhasil dibuat dengan variasi tiket!');
     }
     public function show($id)
     {
