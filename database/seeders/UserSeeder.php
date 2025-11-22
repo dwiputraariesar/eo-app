@@ -38,8 +38,8 @@ class UserSeeder extends Seeder
 
         // 3. Buat Akun USER (Attendee/Pembeli)
         User::create([
-            'first_name' => 'User',
-            'last_name'  => 'Biasa',
+            'first_name' => 'Dwi Putra',
+            'last_name'  => 'Putra',
             'email'      => 'user@example.com',
             'phone'      => '085678901234',
             'password'   => Hash::make('password'),

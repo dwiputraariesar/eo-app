@@ -20,36 +20,35 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-blue-600">EO App</a>
+                    <a href="/">
+                        {{-- Ganti teks dengan Logo --}}
+                        {{-- h-8 (tinggi 2rem/32px) atau h-10 biasanya pas untuk navbar --}}
+                        <img src="{{ asset('images/vento-logo-black.png') }}" alt="VENTO" class="h-8 w-auto">
+                    </a>
                 </div>
                 <div class="flex items-center space-x-4">
                     @auth
                         <a href="{{ url('/dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium transition">Dashboard</a>
                     @else
                         <a href="{{ route('login') }}" class="text-gray-700 hover:text-blue-600 font-medium transition">Log in</a>
-                        <a href="{{ route('register') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-sm transition shadow-md">Register</a>
-                    @endauth
+                        <a href="{{ route('register') }}" class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-md font-medium text-sm transition shadow-md">Register</a>                    @endauth
                 </div>
             </div>
         </div>
     </nav>
 
-    {{-- Hero Section Compact --}}
-    <div class="relative bg-blue-600 py-10 text-center text-white bg-cover bg-center" style="background-image: url('{{ asset('images/header-bg.jpg') }}');">
-        <div class="absolute inset-0 bg-black opacity-50"></div>
+    {{-- Hero Section dengan Background Main --}}
+    <div class="relative bg-gray-900 py-10 text-center text-white bg-cover bg-center" 
+         style="background-image: url('{{ asset('images/background-main.jpg') }}');">
+        
+        {{-- Opacity saya kurangi jadi 40% karena background Anda sudah gelap --}}
+        <div class="absolute inset-0 bg-black opacity-40"></div>
         
         <div class="relative z-10 flex flex-col items-center justify-center h-full px-4">
-            {{-- 
-                LOGO (vento-logo-white.png)
-                w-60 md:w-[350px] -> Ukuran pas agar tidak perlu scroll
-                mb-0              -> Jarak ke teks dibuat 0 (rapat)
-            --}}
+            {{-- LOGO VENTO --}}
             <img src="{{ asset('images/vento-logo-white.png') }}" alt="VENTO Logo" class="w-60 md:w-[350px] mb-0 mx-auto drop-shadow-lg">
             
-            {{-- 
-                TEKS TAGLINE
-                mt-2 -> Memberi sedikit jarak dari logo (opsional, bisa dihapus jika ingin lebih rapat)
-            --}}
+            {{-- TEKS TAGLINE --}}
             <h1 class="text-lg md:text-2xl font-['Montserrat'] font-medium drop-shadow-md tracking-[0.3em] leading-tight uppercase mt-2">
                 Catch the Vibe
             </h1>

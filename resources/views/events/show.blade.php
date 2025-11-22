@@ -13,14 +13,18 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-blue-600">EO App</a>
+                    <a href="/">
+                        {{-- Ganti teks dengan Logo --}}
+                        {{-- h-8 (tinggi 2rem/32px) atau h-10 biasanya pas untuk navbar --}}
+                        <img src="{{ asset('images/vento-logo-black.png') }}" alt="VENTO" class="h-8 w-auto">
+                    </a>
                 </div>
                 <div class="flex items-center space-x-4">
                     @auth
                         <a href="{{ route('dashboard') }}" class="text-gray-700 font-medium">Dashboard</a>
                     @else
                         <a href="{{ route('login') }}" class="text-gray-700 font-medium">Log in</a>
-                        <a href="{{ route('register') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium text-sm">Register</a>
+                        <a href="{{ route('register') }}" class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-md font-medium text-sm transition shadow-md">Register</a>                    
                     @endauth
                 </div>
             </div>
