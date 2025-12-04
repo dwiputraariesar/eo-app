@@ -6,6 +6,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,9 +73,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // --- 5. AREA KHUSUS ADMIN ---
     Route::middleware('role:admin')->group(function () {
-        Route::get('/admin/dashboard', function () {
-            return view('admin.dashboard'); 
-        })->name('admin.dashboard');
+        // Dashboard
+        Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+        // User Management
+        Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
+        Route::patch('/admin/users/{id}/update-role', [AdminController::class, 'updateUserRole'])->name('admin.users.update-role');
+        Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+
+        // Event Management
+        Route::get('/admin/events', [AdminController::class, 'events'])->name('admin.events');
+        Route::patch('/admin/events/{id}/update-status', [AdminController::class, 'updateEventStatus'])->name('admin.events.update-status');
+        Route::delete('/admin/events/{id}', [AdminController::class, 'deleteEvent'])->name('admin.events.delete');
+
+        // Booking & Payment Overview
+        Route::get('/admin/bookings', [AdminController::class, 'bookings'])->name('admin.bookings');
+
+        // Category Management
+        Route::get('/admin/categories', [AdminController::class, 'categories'])->name('admin.categories');
+        Route::get('/admin/categories/create', [AdminController::class, 'createCategory'])->name('admin.categories.create');
+        Route::post('/admin/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+        Route::get('/admin/categories/{id}/edit', [AdminController::class, 'editCategory'])->name('admin.categories.edit');
+        Route::put('/admin/categories/{id}', [AdminController::class, 'updateCategory'])->name('admin.categories.update');
+        Route::delete('/admin/categories/{id}', [AdminController::class, 'deleteCategory'])->name('admin.categories.delete');
     });
 
 }); 
