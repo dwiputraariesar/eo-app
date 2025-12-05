@@ -117,8 +117,8 @@
 
                                         <!-- Date -->
                                         <td class="p-4 text-sm text-gray-600">
-                                            {{ $booking->created_at->format('d M Y') }}
-                                            <div class="text-xs text-gray-400">{{ $booking->created_at->format('H:i') }}</div>
+                                            {{ $booking->created_at?->format('d M Y') ?? 'N/A' }}
+                                            <div class="text-xs text-gray-400">{{ $booking->created_at?->format('H:i') ?? 'N/A' }}</div>
                                         </td>
                                     </tr>
                                     @endforeach

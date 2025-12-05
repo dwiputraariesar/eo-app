@@ -137,8 +137,8 @@
 
                                         <!-- Date -->
                                         <td class="p-4 align-top text-sm text-gray-600">
-                                            {{ \Carbon\Carbon::parse($event->start_datetime)->format('d M Y') }}
-                                            <div class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($event->start_datetime)->format('H:i') }}</div>
+                                            {{ $event->start_datetime ? \Carbon\Carbon::parse($event->start_datetime)->format('d M Y') : 'N/A' }}
+                                            <div class="text-xs text-gray-400">{{ $event->start_datetime ? \Carbon\Carbon::parse($event->start_datetime)->format('H:i') : 'N/A' }}</div>
                                         </td>
 
                                         <!-- Status with Dropdown -->

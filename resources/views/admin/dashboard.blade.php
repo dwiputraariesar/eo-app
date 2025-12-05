@@ -247,7 +247,7 @@
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-500 border border-blue-500/30">Attendee</span>
                                         @endif
-                                        <div class="text-xs text-gray-500 mt-1">{{ $user->created_at->diffForHumans() }}</div>
+                                        <div class="text-xs text-gray-500 mt-1">{{ $user->created_at?->diffForHumans() ?? 'N/A' }}</div>
                                     </div>
                                 </div>
                                 @endforeach
@@ -293,7 +293,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="text-xs text-gray-500">{{ $event->created_at->diffForHumans() }}</div>
+                                    <div class="text-xs text-gray-500">{{ $event->created_at?->diffForHumans() ?? 'N/A' }}</div>
                                 </div>
                                 @endforeach
                             </div>
@@ -353,7 +353,7 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="p-3 text-xs text-gray-400">{{ $booking->created_at->diffForHumans() }}</td>
+                                        <td class="p-3 text-xs text-gray-400">{{ $booking->created_at?->diffForHumans() ?? 'N/A' }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

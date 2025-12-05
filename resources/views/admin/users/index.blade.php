@@ -152,8 +152,8 @@
 
                                         <!-- Registration Date -->
                                         <td class="p-4 text-sm text-gray-600">
-                                            {{ $user->created_at->format('d M Y') }}
-                                            <div class="text-xs text-gray-400">{{ $user->created_at->diffForHumans() }}</div>
+                                            {{ $user->created_at?->format('d M Y') ?? 'N/A' }}
+                                            <div class="text-xs text-gray-400">{{ $user->created_at?->diffForHumans() ?? 'N/A' }}</div>
                                         </td>
 
                                         <!-- Actions -->
