@@ -68,6 +68,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // === INI DIA YANG TADINYA HILANG (Laporan Peserta) ===
         Route::get('/mitra/events/{id}/participants', [EventController::class, 'participants'])->name('mitra.events.participants');
+        
+        // Halaman Penjualan
+        Route::get('/mitra/sales', [EventController::class, 'sales'])->name('mitra.sales');
     });
 
 

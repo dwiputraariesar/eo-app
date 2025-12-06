@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
-use App\Models\Category; 
+use App\Models\Category;
+use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
@@ -191,5 +193,106 @@ class EventController extends Controller
                           ->get();
 
         return view('mitra.events.participants', compact('event', 'bookings'));
+    }
+
+    /**
+     * Menampilkan halaman hasil penjualan event untuk organizer.
+     */
+    public function sales()
+    {
+        $organizerId = Auth::id();
+
+        // Ambil semua event milik organizer
+        $events = Event::where('organizer_id', $organizerId)
+            ->with(['bookings' => function($query) {
+                $query->with('user', 'ticketCategory');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Hitung statistik keseluruhan
+        $totalRevenue = Booking::whereHas('event', function($query) use ($organizerId) {
+            $query->where('organizer_id', $organizerId);
+        })
+        ->where('status', 'confirmed')
+        ->sum('total_amount');
+
+        $pendingRevenue = Booking::whereHas('event', function($query) use ($organizerId) {
+            $query->where('organizer_id', $organizerId);
+        })
+        ->where('status', 'pending')
+        ->sum('total_amount');
+
+        $totalBookings = Booking::whereHas('event', function($query) use ($organizerId) {
+            $query->where('organizer_id', $organizerId);
+        })->count();
+
+        $confirmedBookings = Booking::whereHas('event', function($query) use ($organizerId) {
+            $query->where('organizer_id', $organizerId);
+        })
+        ->where('status', 'confirmed')
+        ->count();
+
+        $pendingBookings = Booking::whereHas('event', function($query) use ($organizerId) {
+            $query->where('organizer_id', $organizerId);
+        })
+        ->where('status', 'pending')
+        ->count();
+
+        // Hitung pendapatan per event
+        $eventSales = collect([]);
+        foreach ($events as $event) {
+            $confirmedSales = $event->bookings()->where('status', 'confirmed')->sum('total_amount');
+            $pendingSales = $event->bookings()->where('status', 'pending')->sum('total_amount');
+            $totalTicketsSold = $event->bookings()->where('status', 'confirmed')->sum('quantity');
+            $totalBookingsCount = $event->bookings()->count();
+            $confirmedBookingsCount = $event->bookings()->where('status', 'confirmed')->count();
+
+            $eventSales->push([
+                'event' => $event,
+                'confirmed_revenue' => $confirmedSales,
+                'pending_revenue' => $pendingSales,
+                'total_tickets_sold' => $totalTicketsSold,
+                'total_bookings' => $totalBookingsCount,
+                'confirmed_bookings' => $confirmedBookingsCount,
+            ]);
+        }
+
+        // Data untuk grafik pendapatan 6 bulan terakhir
+        $revenueData = [];
+        $revenueLabels = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $revenueLabels[] = $date->format('M Y');
+            $revenueData[] = Booking::whereHas('event', function($query) use ($organizerId) {
+                $query->where('organizer_id', $organizerId);
+            })
+            ->where('status', 'confirmed')
+            ->whereYear('created_at', $date->year)
+            ->whereMonth('created_at', $date->month)
+            ->sum('total_amount');
+        }
+
+        // Booking terbaru
+        $recentBookings = Booking::whereHas('event', function($query) use ($organizerId) {
+            $query->where('organizer_id', $organizerId);
+        })
+        ->with(['user', 'event', 'ticketCategory'])
+        ->orderBy('created_at', 'desc')
+        ->take(10)
+        ->get();
+
+        return view('mitra.sales', compact(
+            'events',
+            'totalRevenue',
+            'pendingRevenue',
+            'totalBookings',
+            'confirmedBookings',
+            'pendingBookings',
+            'eventSales',
+            'revenueData',
+            'revenueLabels',
+            'recentBookings'
+        ));
     }
 }
